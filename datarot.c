@@ -1,9 +1,10 @@
-#define TEST
+#define DEBUG
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include "svdfit.h"
 #include "bioplib/array.h"
+#include "bioplib/general.h"
 
 
 #define SMALL 0.001
@@ -16,9 +17,7 @@ BOOL FindIntersection(REAL m1, REAL c1, REAL m2, REAL c2,
 void TranslateData(REAL *xData, REAL *yData, int ndata, REAL transX, REAL transY);
 REAL FindAngle(REAL m1, REAL m2);
 void RotateData(REAL *xData, REAL *yData, int ndata, REAL angle);
-
-
-
+void GetCSVFields(char *buffer,int field1, int field2, REAL *x, REAL *y);
 
 
 
@@ -28,11 +27,13 @@ int main(int argc, char **argv)
 {
    FILE *fp = NULL;
    
-   if((fp=fopen("corrected.csv", "r"))!=NULL)
+
+   if((fp=fopen("test/Everything_NR2_SklearnGBReg.csv", "r"))!=NULL)
    {
       int ndata = 0, i;
       REAL xData[MAXDATA],
          yData[MAXDATA],
+         xDataOrig[MAXDATA],
          m = 0.285,
          c = -32.477,
          intersectX,
@@ -44,26 +45,33 @@ int main(int argc, char **argv)
       for(i=-60; i<-30; i+=5)
       {
          xData[ndata] = i;
+         xDataOrig[ndata] = i;
          /*yData[ndata] = i;*/
 	 yData[ndata] = 2 * i + 5;
          ndata++;
-      }
-      printf("Original Data\n");
-      
-      for (i=0; i<ndata; i++)
-      {
-         printf("%f,%f\n", xData[i], yData[i]);
       }
 #else
       char buffer[MAXBUFF];
       while(fgets(buffer, MAXBUFF, fp))
       {
-         REAL x, y;
-         
-         sscanf(buffer, "%lf,%lf", &x, &y);
-         xData[ndata] = x;
-         yData[ndata] = y;
-         ndata++;
+         if(buffer[0] != '#')
+         {
+            REAL x, y;
+            GetCSVFields(buffer,1,2,&x,&y);
+            xData[ndata] = x;
+            xDataOrig[ndata] = x;
+            yData[ndata] = y;
+            ndata++;
+         }
+      }
+#endif
+
+#ifdef DEBUG
+      printf("Original Data:\n");
+      
+      for (i=0; i<ndata; i++)
+      {
+         printf("%f,%f\n", xData[i], yData[i]);
       }
 #endif
       
@@ -73,17 +81,23 @@ int main(int argc, char **argv)
          
          TranslateData(xData, yData, ndata, -intersectX, -intersectY);
          angle = FindAngle(m, 1);
-         RotateData(xData, yData, ndata, angle);
+         RotateData(xData, yData, ndata, -angle);
          TranslateData(xData, yData, ndata, intersectX, intersectY);
-#ifdef TEST
+#ifdef DEBUG
          printf("Int: %.3f %.3f\n", intersectX, intersectY);
          printf("Ang: %.3f\n", 180*angle/PI);
 #endif
          
       }
+      printf("Rotated Data:\n");
       for (i=0; i<ndata; i++)
       {
          printf("%f,%f\n", xData[i], yData[i]);
+      }
+      printf("Rotated Y Data (X original):\n");
+      for (i=0; i<ndata; i++)
+      {
+         printf("%f,%f\n", xDataOrig[i], yData[i]);
       }
    }
    return(0);
@@ -156,5 +170,28 @@ void RotateData(REAL *xData, REAL *yData, int nData, REAL theta)
       xData[i] = x;
       yData[i] = y;
    }
+}
+
+void GetCSVFields(char *buffer,int field1, int field2, REAL *x, REAL *y)
+{
+   int field = 0;
+   char *chp,
+      word[MAXBUFF];
+   
+   for(chp=buffer; chp!=NULL; )
+   {
+      chp = blGetWord(chp, word, MAXBUFF);
+      if(field == field1)
+      {
+         sscanf(word, "%lf", x);
+      }
+      else if(field == field2)
+      {
+         sscanf(word, "%lf", y);
+      }
+      
+      field++;
+   }
+   
 }
 
