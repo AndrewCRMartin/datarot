@@ -36,6 +36,11 @@ def FindIntersection(m1, c1, m2, c2):
    
    return(x, y, True)
 
+def TranslateDataPoint(x, y, transX, transY):
+   x = x + transX
+   y = y + transY
+   return(x, y)
+
 
 def TranslateDataArrays(xData, yData, ndata, transX, transY):
    """
@@ -44,8 +49,8 @@ def TranslateDataArrays(xData, yData, ndata, transX, transY):
       returns the new arrays
    """
    for i in range(ndata):
-      xData[i] = xData[i] + transX
-      yData[i] = yData[i] + transY
+      (xData[i], yData[i]) = TranslateDataPoint(xData[i], yData[i],
+                                                transX,   transY)
    return(xData, yData)
 
 
