@@ -67,6 +67,11 @@ def FindAngle(m1, m2):
    tanTheta = (m1-m2)/(1 + m1*m2)
    return(math.atan(tanTheta))
 
+def RotateDataPoint(x, y, theta):
+   xNew = x * math.cos(theta) - y * math.sin(theta)
+   yNew = x * math.sin(theta) + y * math.cos(theta)
+   return(xNew, yNew)
+   
 
 def RotateDataArray(xData, yData, nData, theta):
    """
@@ -75,11 +80,13 @@ def RotateDataArray(xData, yData, nData, theta):
    """
    
    for i in range(nData):
-      x = xData[i] * math.cos(theta) - yData[i] * math.sin(theta)
-      y = xData[i] * math.sin(theta) + yData[i] * math.cos(theta)
-      xData[i] = x
-      yData[i] = y
+      (xData[i], yData[i]) = RotateDataPoint(xData[i], yData[i], theta);
    return(xData, yData)
+
+
+
+
+
 
 if(__name__ == '__main__'):
    # Main program
