@@ -57,8 +57,7 @@ def RotateData(xData, yData, nData, theta):
         yData[i] = y
     return(xData, yData)
 
-#if(__name__ == '__MAIN__'):
-if(True):
+if(__name__ == '__main__'):
     # Main program
     with open ("test/Everything_NR2_SklearnGBReg.csv") as file:
         ndata = 0
