@@ -73,7 +73,7 @@ int main(int argc, char **argv)
          
          TranslateData(xData, yData, ndata, -intersectX, -intersectY);
          angle = FindAngle(m, 1);
-         RotateData(xData, yData, ndata, -angle);
+         RotateData(xData, yData, ndata, angle);
          TranslateData(xData, yData, ndata, intersectX, intersectY);
 #ifdef TEST
          printf("Int: %.3f %.3f\n", intersectX, intersectY);
