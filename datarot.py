@@ -139,6 +139,20 @@ def CorrectAndPrintDataFile(dataFile, m, c):
       for i in range(ndata):
          print("%f,%f" % (xDataOrig[i], yData[i]))
 
+   
+#-----------------------------------------------------------------------
+def CorrectYDataPoint(y, m, c):
+   x = y
+    
+   intersectX, intersectY, ok = FindIntersection(m, c, 1, 0)
+   if(ok):
+      x, y  = TranslateDataPoint(x, y, -intersectX, -intersectY)
+      angle = FindAngle(m, 1)
+      x, y  = RotateDataPoint(x, y, -angle)
+      x, y  = TranslateDataPoint(x, y,  intersectX,  intersectY)
+
+      return(y)
+         
 #-----------------------------------------------------------------------
 def CorrectDataPoint(x, y, m, c, useOrigX):
    xOrig = x
